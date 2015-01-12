@@ -1,0 +1,141 @@
+#!/bin/sh
+# script to copy necessary files to ../../ia/ and ~binsyn/oa
+# this script produces light curves and corresponding plot files
+set -e
+
+rm ../../ia/*
+rm ../../oa/*
+cp IN/LINKV.DAT ../../ia/
+cp IN/CALPT.INF ../../ia/ACR.INF
+cp IN/PGA.INF ../../ia/PGA.IUP
+cp IN/PGA.INF ../../ia/PGACR.INF	
+cp IN/PGB.INF ../../ia/BCR.INF
+cp IN/PGC.INF ../../ia/PGCA.INF
+cp ../../pgb/PGBX6.DAT ../../oa/PGBX6SV.DAT
+############ INPUT ############
+cp IN/CALPT.INF ../../ia/               #CALPT Roche-Lobe potentia
+cp IN/PGA.INF ../../ia/                 #PGA   Grids of two components
+cp IN/PGB.INF ../../ia/                 #PGB   Orbital geometric parameters (for LC fitting with KCTRL=0)
+#cp IN/PGB_plotcvs.INF ../../ia/         #PGB   Orbital geometric parameters (for plotting CVs)
+cp IN/PGC.INF ../../ia/                 #PGC   Temperature of two components
+cp IN/PGD.INF ../../ia/                 #PGD   Radiation of two components
+cp IN/PLTB.INF ../../ia/				#PLTB  output PLTB3.DAT is very important for ACPGB
+cp IN/ACPGA.INF ../../ia/				#ACPGA Grids of Accretion disk 
+cp IN/ACPGB.INF ../../ia/				#ACPGB Optical thick/Optical thin of Accretion disk
+cp IN/ACPGC.INF ../../ia/				#ACPGC Temperature of Accretion disk 
+cp IN/PGCAC.INF ../../ia/               #PGCAC Irradiation from AC or M-dwarf
+cp IN/ACPGD.INF ../../ia/				#ACPGD Orbital paraters of Accretion disk
+      #cp IN/PLTDD1.INF ../../ia/              #PLTDD Plot accretion disk (1)
+      #cp IN/PLTDD2.INF ../../ia/              #PLTDD Plot accretion disk (2)
+cp IN/SPT.INF ../../ia/                 #SPT   Compare observed LC with theoretical one
+cp spt/SPT.ILS.ac ../../spt/SPT.ILS     #SPT   Necessary filelist for SPT(with accretion disk)
+cp spt/sptscr.ac ../../spt/sptscr       #SPT   Necessary filelist for SPT(with accretion disk)
+cp IN/VVTST3.MGS ../../oa/VVTST3.MGS    #Observation data
+cp IN/LTCVA.INF ../../ia/               #LTCVA Plot theoretical light curves
+cp IN/LTRES.INF ../../ia/               #LTRES calculate resolution
+
+# spots section
+cp IN/NSPOTS.DAT ../../ia/          #number of spots
+cp IN/VLMDA.DAT ../../ia/           #latitudes first component
+cp IN/VGMDA.DAT ../../ia/           #longitudes first component
+cp IN/VBTDA.DAT ../../ia/           #angular radii first component
+cp IN/VLMDB.DAT ../../ia/           #latitudes second component 
+cp IN/VGMDB.DAT ../../ia/           #longtitude second component
+cp IN/VBTDB.DAT ../../ia/           #angular radii second component
+cp IN/DLTAA.DAT ../../ia/           #temperature contrasts first component
+cp IN/DLTAB.DAT ../../ia/           #temperature contrasts second component
+
+# accretion disk section
+cp IN/FCTMP.DAT ../../ia/           #temperature on accretion disk face ring
+cp IN/RMTMP.DAT ../../ia/           #temperature on accretion disk rim
+
+#### needn't to be changed
+cp IN/RFMG.DAT ../../ia/
+cp IN/THLT.DAT ../../ia/
+cp IN/PHAS.DAT ../../ia/
+cp IN/SIGMA.DAT ../../ia/
+cp IN/VNSE.DAT ../../ia/
+cp IN/DPHS.DAT ../../ia/
+############ INPUT ############
+
+
+############ RUNNING ############
+#Roche Lobe
+cd ../../calpt
+./calptscr
+
+#### needn't to be changed
+cd ../transf1
+./transf1scr
+cd ../repl4
+./repl4scr
+
+#setting components
+cd ../pga
+./pgascr
+cd ../pgb
+./pgbscr
+cd ../pgc
+./pgcscr
+cd ../pgd
+./pgdscr
+
+#plot the projected two components without Accretion disk
+cd ../pltb
+./pltbscr
+
+#setting accretion disk
+cd ../acpga 
+./acpgascr
+cd ../acpgb
+./acpgbscr
+cd ../acpgc
+./acpgcscr
+#evaluate the interactive irradiation between the heating of the secondary and the accretion disk
+cd ../pgcac
+./pgcacscr
+cp ../oa/PGCAC2.DAT ../oa/PGCX2.DAT
+cp ../oa/PGCAC3.DAT ../oa/PGCX3.DAT
+cd ../acpgd
+./acpgdscr
+
+
+      ##Plot the projected CVs components with accretion disk (point dataset)
+      #cd ../pltdd
+      #./pltddscr
+      ##Plot the projected CVs components with accretion disk (profile dataset)
+      #cd ../horzplta
+      #./horzpltascr
+
+cd ../spt
+./sptscr
+
+cd ../ltcva
+./ltcvascr
+cd ../ltres
+./ltresscr
+############ RUNNING ############
+
+
+############ OUTPUT ############
+cd ../systems/ntest/OUT
+cp ../../../oa/CALPTO1.DAT ./           #CALPT output
+cp ../../../oa/PGAX*.DAT ./             #PGA   output
+cp ../../../oa/PGADB.DAT ./             #PGA   output
+cp ../../../oa/PGBX*.DAT ./             #PGB   output
+cp ../../../oa/PGCX*.DAT ./             #PGC   output
+cp ../../../oa/PGCDBG.DAT ./            #PGC   output
+cp ../../../oa/PGDX*.DAT ./             #PGD   output
+cp ../../../oa/SPTDB.DAT ./             #SPT   output
+cp ../../../oa/PGSX*.DAT ./             #SPT   output
+cp ../../../oa/SDV.DAT ./               #SPT   output
+cp ../../../oa/INDATA.DAT ./            #LTCVA Observed LC in mag (crossing phase 0)
+cp ../../../oa/THLC1.DAT ./             #LTCVA Fiting  LC
+cp ../../../oa/OBSLC1.DAT ./            #LTCVA Observed LC in flux(?)
+cp ../../../oa/LTRES.DAT ./             #LTRES output 
+#cp ../../../oa/COL*.DAT ./              #LTRES output
+      cp ../../../oa/PLTB*.DAT ./             #PLTB output
+      #cp ../../../oa/PLTDD*.DAT ./            #PLTDD output
+      #cp ../../../oa/HZPLT*.DAT ./            #HZPLT output
+############ OUTPUT ############
+set +e
